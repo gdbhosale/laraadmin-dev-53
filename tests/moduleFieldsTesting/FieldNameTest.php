@@ -35,12 +35,7 @@ class FieldNameTest extends TestCase
 			->seePageIs('/');
 	}
 
-	/**
-	 * Test Module Field - Name
-	 *
-	 * @return void
-	 */
-	public function testModuleFieldName()
+	public function testCreateModuleAndField()
 	{
 		// Create Students Module
 		$this->visit('/admin/modules')
@@ -89,13 +84,7 @@ class FieldNameTest extends TestCase
 			->see('StudentsController');
 	}
 
-	/**
-	 * Test Module Field - Name - Part 2
-	 *
-	 * @return void
-	 */
-	/*
-	public function testModuleFieldName2()
+	public function testUseField()
 	{
 		// Create a Row with Name Field
 		$this->visit('/admin/students')
@@ -107,21 +96,23 @@ class FieldNameTest extends TestCase
 		// Edit a Row with Name Field
 
 		// Delete a Row with Name Field
-		
-		// Delete Name Field
+	}
+
+	public function testDeleteField()
+	{
+		// Delete Field
 		$this->visit('/admin/modules/'.$this->probable_module_id)
 			->see("StudentsController")
 			->click('delete_name');
 	}
-	*/
 
 	/**
-     * Delete Current Test Data
-     *
-     * @return void
-     */
+	 * Delete Current Test Data
+	 *
+	 * @return void
+	 */
 	public function testDeleteData()
-    {
+	{
 		// Delete CRUD's Data
 		LAHelper::deleteFile(base_path('/app/Http/Controllers/LA/StudentsController.php'));
 		LAHelper::deleteFile(base_path('/app/Models/Student.php'));
@@ -129,11 +120,11 @@ class FieldNameTest extends TestCase
 		LAHelper::deleteFile(base_path('/resources/views/la/students/index.blade.php'));
 		LAHelper::deleteFile(base_path('/resources/views/la/students/show.blade.php'));
 
-        if(LAHelper::laravel_ver() == 5.3) {
-            exec('git checkout '.'routes/admin_routes.php');
-        } else {
-            exec('git checkout '.'app/Http/admin_routes.php');
-        }
+		if(LAHelper::laravel_ver() == 5.3) {
+			exec('git checkout '.'routes/admin_routes.php');
+		} else {
+			exec('git checkout '.'app/Http/admin_routes.php');
+		}
 
 		// Delete migration table
 		$this->artisan('migrate:reset');
@@ -156,9 +147,9 @@ class FieldNameTest extends TestCase
 		}
 		$this->artisan('clear-compiled');
 		$this->artisan('cache:clear');
-		Log::info(exec($composer_path.' dump-autoload'));
+		// Log::info(exec($composer_path.' dump-autoload'));
 
 		$this->refreshApplication();
 		$this->artisan('migrate');
-    }
+	}
 }
