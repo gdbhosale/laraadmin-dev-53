@@ -121,7 +121,7 @@ class FieldNameTest extends TestCase
 			unlink($mgr_file);
 		}
 		// Delete migration table
-		$this->artisan('db:reset');
+		$this->artisan('migrate:reset');
 		DB::statement("DROP TABLE migrations");
     }
 
