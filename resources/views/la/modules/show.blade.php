@@ -44,6 +44,7 @@ use Dwij\Laraadmin\Models\Module;
 			@if($module->view_col != "")
 				@if(isset($module->is_gen) && $module->is_gen)
 					<div class="dats1 text-center"><a data-toggle="tooltip" data-placement="left" title="Update Module" class="btn btn-sm btn-success" style="border-color:#FFF;" id="generate_update" href="#"><i class="fa fa-refresh"></i> Update Module</a></div>
+					<div class="dats1 text-center"><a data-toggle="tooltip" data-placement="left" title="Update Migration File" class="btn btn-sm btn-success" style="border-color:#FFF;" id="update_migr" href="#"><i class="fa fa-database"></i> Update Migration</a></div>
 				@else
 					<div class="dats1 text-center"><a data-toggle="tooltip" data-placement="left" title="Generate Migration + CRUD + Module" class="btn btn-sm btn-success" style="border-color:#FFF;" id="generate_migr_crud" href="#"><i class="fa fa-cube"></i> Generate Migration + CRUD</a></div>
 					
@@ -272,10 +273,13 @@ use Dwij\Laraadmin\Models\Module;
 						</div>
 					</div>	
 					
-					<div class="form-group">
-						<label for="defaultvalue">Default Value :</label>
-						{{ Form::text("defaultvalue", null, ['class'=>'form-control', 'placeholder'=>'Default Value']) }}
+					<div id="default_val">
+						<div class="form-group">
+							<label for="defaultvalue">Default Value :</label>
+							{{ Form::text("defaultvalue", null, ['class'=>'form-control', 'placeholder'=>'Default Value']) }}
+						</div>
 					</div>
+
 					<div id="length_div">
 						<div class="form-group">
 							<label for="minlength">Minimum :</label>
@@ -423,6 +427,11 @@ $(function () {
 		if(ft_val == 1 || ft_val == 2 || ft_val == 3 || ft_val == 7 || ft_val == 9 || ft_val == 11 || ft_val == 12 || ft_val == 15 || ft_val == 18 || ft_val == 20 || ft_val == 21 || ft_val == 24 ) {
 			$('#unique_val').addClass("hide");
 		}
+
+		$('#default_val').removeClass("hide");
+		if(ft_val == 11) {
+			$('#default_val').addClass("hide");
+		}
 	}
 
 	$("select[name='field_type']").on("change", function() {
@@ -472,6 +481,23 @@ $(function () {
     $("#sortable_module_fields").disableSelection();	
 	
 	$("#generate_migr").on("click", function() {
+		var $fa = $(this).find("i");
+		$fa.removeClass("fa-database");
+		$fa.addClass("fa-refresh");
+		$fa.addClass("fa-spin");
+		$.ajax({
+			url: "{{ url(config('laraadmin.adminRoute') . '/module_generate_migr') }}/"+{{ $module->id }},
+			method: 'GET',
+			success: function( data ) {
+				$fa.removeClass("fa-refresh");
+				$fa.removeClass("fa-spin");
+				$fa.addClass("fa-check");
+				console.log(data);
+				location.reload();
+			}
+		});
+	});
+	$("#update_migr").on("click", function() {
 		var $fa = $(this).find("i");
 		$fa.removeClass("fa-database");
 		$fa.addClass("fa-refresh");
