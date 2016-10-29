@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Log;
 
 class FieldNameTest extends TestCase
 {
@@ -30,6 +31,88 @@ class FieldNameTest extends TestCase
 			->press('Register')
 			->seePageIs('/');
 	}
+
+	/**
+	 * Test Module Field - Name
+	 *
+	 * @return void
+	 */
+	public function testModuleFieldName()
+	{
+		// Create Students Module
+		$this->visit('/admin/modules')
+			->dontSee("StudentsController")
+			->see('modules listing')
+			->type('Students', 'name')
+			->type('fa-user-plus', 'icon')
+			->press('Submit')
+			->see("StudentsController");
+		
+		// Create Name Field
+		$this->see("StudentsController")
+			->type('Name', 'label')
+			->type('name', 'colname')
+			->select('16', 'field_type')
+			->check('unique')
+			->type('', 'defaultvalue')
+			->type('10', 'minlength')
+			->type('100', 'maxlength')
+			->check('required')
+			->press('Submit')
+			->see("StudentsController")
+			->see('view_col_name')
+			->click('view_col_name')
+			->dontSee('view_col_name')
+			->see('generate_migr_crud');
+		
+		// Edit Name Field - As it is
+		$this->see("StudentsController")
+			->click('edit_name')
+			->see('from Student module')
+			->press('Update')
+			->see("StudentsController");
+
+		// Generate CRUD's
+
+		Log::info("Generate CRUD's");
+
+		// $this->visit('/admin/module_generate_migr_crud/'.$this->probable_module_id)->see('xyz');
+		
+		$response = $this->call('GET', '/admin/module_generate_migr_crud/'.$this->probable_module_id);
+		Log::info($response->content()." - ".$response->status());
+		$this->assertEquals(200, $response->status());
+
+		// $this->visit('/admin/modules/'.$this->probable_module_id)
+		// 	->see('Module Generated')
+		// 	->see('Update Module')
+		// 	->see('StudentsController');
+	}
+
+	/**
+	 * Test Module Field - Name - Part 2
+	 *
+	 * @return void
+	 */
+	/*
+	public function testModuleFieldName2()
+	{
+		// Create a Row with Name Field
+		$this->visit('/admin/students')
+			->see('Students listing')
+			->type('John Doe', 'name')
+			->press('Submit')
+			->see("John Doe");
+		
+		// Edit a Row with Name Field
+
+		// Delete a Row with Name Field
+		
+		// Delete Name Field
+		$this->visit('/admin/modules/'.$this->probable_module_id)
+			->see("StudentsController")
+			->click('delete_name');
+	}
+	*/
 
 	/**
      * Delete Current Test Data
