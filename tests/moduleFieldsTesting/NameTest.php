@@ -86,16 +86,47 @@ class NameTest extends TestCase
 
 	public function testUseField()
 	{
-		// Create a Row with Name Field
+		// Create a Row
 		$this->visit('/admin/students')
 			->see('Students listing')
 			->type('John Doe', 'name')
 			->press('Submit')
 			->see("John Doe");
 		
-		// Edit a Row with Name Field
-
-		// Delete a Row with Name Field
+		// View a Row
+		$this->visit('/admin/students/1')
+			->seePageIs('/admin/students/1')
+			->see('Test Description in one line')
+			->see("John Doe");
+		
+		// Edit a Row As it is
+		$this->visit('/admin/students/1')
+			->see('John Doe')
+			->click('edit_this_record')
+			->seePageIs('/admin/students/1/edit')
+			->press("Update");
+		
+		// Edit a Row - Value Change
+		$this->visit('/admin/students/1')
+			->see('John Doe')
+			->click('edit_this_record')
+			->seePageIs('/admin/students/1/edit')
+			->type('John Wick', 'name')
+			->press("Update")
+			->seePageIs('/admin/students')
+			->visit('/admin/students/1')
+			->dontSee("John Doe")
+			->see("John Wick");
+			
+		// Delete a Row
+		$this->visit('/admin/students/1')
+			->see('John Wick')
+			->click('delete_this_record')
+			->seePageIs('/admin/students');
+		
+		// Test deleted record
+		$this->visit('/admin/students/1')
+			->see('Student with id 1 not found');
 	}
 
 	public function testDeleteField()
@@ -113,6 +144,8 @@ class NameTest extends TestCase
 	 */
 	public function testDeleteData()
 	{
+		return;
+
 		// Delete CRUD's Data
 		LAHelper::deleteFile(base_path('/app/Http/Controllers/LA/StudentsController.php'));
 		LAHelper::deleteFile(base_path('/app/Models/Student.php'));
