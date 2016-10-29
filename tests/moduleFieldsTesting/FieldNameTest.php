@@ -113,46 +113,29 @@ class FieldNameTest extends TestCase
 	public function testDeleteData()
     {
 		// Delete CRUD's Data
-		$this->del_test_cruds();
-
-		// Delete migration file
-		$mgr_file = LAHelper::get_migration_file("students_table");
-		if($mgr_file != "") {
-			unlink($mgr_file);
-		}
-		// Delete migration table
-		$this->artisan('migrate:reset');
-		DB::statement("DROP TABLE migrations");
-    }
-
-	private function del_test_cruds()
-	{
 		unlink(base_path('/app/Http/Controllers/LA/StudentsController.php'));
 		unlink(base_path('/app/Models/Student.php'));
 		unlink(base_path('/resources/views/la/students/edit.blade.php'));
 		unlink(base_path('/resources/views/la/students/index.blade.php'));
 		unlink(base_path('/resources/views/la/students/show.blade.php'));
 
-		// Find existing test migration file and delete it
-        $mfiles = scandir(base_path('database/migrations/'));
-        foreach ($mfiles as $mfile) {
-            if(str_contains($mfile, "students")) {
-                $mgr_file = base_path('database/migrations/'.$mfile);
-                if(file_exists($mgr_file)) {
-                    $templateDirectory = __DIR__.'/../vendor/dwij/laraadmin/src/stubs';
-					$migrationData = file_get_contents($templateDirectory."/migration_removal.stub");
-					$migrationData = str_replace("__migration_class_name__", "CreateStudentsTable", $migrationData);
-					$migrationData = str_replace("__db_table_name__", "students", $migrationData);
-					file_put_contents(base_path('database/migrations/'.$mfile), $migrationData);
-                    break;
-                }
-            }
-        }
-
         if(LAHelper::laravel_ver() == 5.3) {
             exec('git checkout '.'routes/admin_routes.php');
         } else {
             exec('git checkout '.'app/Http/admin_routes.php');
         }
-	}
+
+		// Delete migration table
+		$this->artisan('migrate:reset');
+		$tables = LAHelper::getDBTables([-1]);
+		DB::statement("DROP TABLE migrations");
+		
+		// Delete migration file
+		$mgr_file = LAHelper::get_migration_file("students_table");
+		if($mgr_file != "") {
+			unlink($mgr_file);
+		}
+
+		$this->artisan('migrate');
+    }
 }
