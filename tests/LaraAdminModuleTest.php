@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use DB;
 
 class LaraAdminModuleTest extends TestCase
 {
@@ -390,8 +389,11 @@ class LaraAdminModuleTest extends TestCase
 		} else if(PHP_OS == "Windows") {
 			$composer_path = "composer";
 		}
+		$this->artisan('clear-compiled');
+		$this->artisan('cache:clear');
 		Log::info(exec($composer_path.' dump-autoload'));
 
+		$this->refreshApplication();
 		$this->artisan('migrate');
     }
 }

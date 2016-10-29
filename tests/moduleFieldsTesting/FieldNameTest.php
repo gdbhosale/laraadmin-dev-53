@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Log;
 
 class FieldNameTest extends TestCase
 {
@@ -155,8 +154,11 @@ class FieldNameTest extends TestCase
 		} else if(PHP_OS == "Windows") {
 			$composer_path = "composer";
 		}
+		$this->artisan('clear-compiled');
+		$this->artisan('cache:clear');
 		Log::info(exec($composer_path.' dump-autoload'));
 
+		$this->refreshApplication();
 		$this->artisan('migrate');
     }
 }
