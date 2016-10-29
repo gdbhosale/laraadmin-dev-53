@@ -336,7 +336,6 @@ class LaraAdminModuleTest extends TestCase
 			->see('Module Generated')
 			->see('Update Module')
 			->see('StudentsController');
-		
 	}
 
 	/**
@@ -392,6 +391,7 @@ class LaraAdminModuleTest extends TestCase
      *
      * @return void
      */
+	/*
     public function testCreatedMigrationDeletion()
     {
 		// Find existing test migration file and delete it
@@ -399,8 +399,11 @@ class LaraAdminModuleTest extends TestCase
         foreach ($mfiles as $mfile) {
             if(str_contains($mfile, "students")) {
                 $mgr_file = base_path('database/migrations/'.$mfile);
-                unlink($mgr_file);
+				echo $mgr_file;
+				if(file_exists($mgr_file))
+                	unlink($mgr_file);
             }
         }
     }
+	*/
 }
