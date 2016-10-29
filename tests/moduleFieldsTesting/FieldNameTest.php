@@ -31,80 +31,6 @@ class FieldNameTest extends TestCase
 			->seePageIs('/');
 	}
 
-	
-	/**
-	 * Test Module Field - Name
-	 *
-	 * @return void
-	 */
-	public function testModuleFieldName()
-	{
-		// Create Students Module
-		$this->visit('/admin/modules')
-			->dontSee("StudentsController")
-			->see('modules listing')
-			->type('Students', 'name')
-			->type('fa-user-plus', 'icon')
-			->press('Submit')
-			->see("StudentsController");
-		
-		// Create Name Field
-		$this->see("StudentsController")
-			->type('Name', 'label')
-			->type('name', 'colname')
-			->select('16', 'field_type')
-			->check('unique')
-			->type('', 'defaultvalue')
-			->type('10', 'minlength')
-			->type('100', 'maxlength')
-			->check('required')
-			->press('Submit')
-			->see("StudentsController")
-			->see('view_col_name')
-			->click('view_col_name')
-			->dontSee('view_col_name')
-			->see('generate_migr_crud');
-		
-		// Edit Name Field - As it is
-		$this->see("StudentsController")
-			->click('edit_name')
-			->see('from Student module')
-			->press('Update')
-			->see("StudentsController");
-
-		// Generate CRUD's
-		$response = $this->call('GET', '/admin/module_generate_migr_crud/'.$this->probable_module_id);
-		$this->assertEquals(200, $response->status());
-		$this->visit('/admin/modules/'.$this->probable_module_id)
-			->see('Module Generated')
-			->see('Update Module')
-			->see('StudentsController');
-	}
-
-	/**
-	 * Test Module Field - Name - Part 2
-	 *
-	 * @return void
-	 */
-	public function testModuleFieldName2()
-	{
-		// Create a Row with Name Field
-		$this->visit('/admin/students')
-			->see('Students listing')
-			->type('John Doe', 'name')
-			->press('Submit')
-			->see("John Doe");
-		
-		// Edit a Row with Name Field
-
-		// Delete a Row with Name Field
-		
-		// Delete Name Field
-		$this->visit('/admin/modules/'.$this->probable_module_id)
-			->see("StudentsController")
-			->click('delete_name');
-	}
-
 	/**
      * Delete Current Test Data
      *
@@ -113,11 +39,11 @@ class FieldNameTest extends TestCase
 	public function testDeleteData()
     {
 		// Delete CRUD's Data
-		unlink(base_path('/app/Http/Controllers/LA/StudentsController.php'));
-		unlink(base_path('/app/Models/Student.php'));
-		unlink(base_path('/resources/views/la/students/edit.blade.php'));
-		unlink(base_path('/resources/views/la/students/index.blade.php'));
-		unlink(base_path('/resources/views/la/students/show.blade.php'));
+		LAHelper::deleteFile(base_path('/app/Http/Controllers/LA/StudentsController.php'));
+		LAHelper::deleteFile(base_path('/app/Models/Student.php'));
+		LAHelper::deleteFile(base_path('/resources/views/la/students/edit.blade.php'));
+		LAHelper::deleteFile(base_path('/resources/views/la/students/index.blade.php'));
+		LAHelper::deleteFile(base_path('/resources/views/la/students/show.blade.php'));
 
         if(LAHelper::laravel_ver() == 5.3) {
             exec('git checkout '.'routes/admin_routes.php');
@@ -127,7 +53,6 @@ class FieldNameTest extends TestCase
 
 		// Delete migration table
 		$this->artisan('migrate:reset');
-		$tables = LAHelper::getDBTables([-1]);
 		DB::statement("DROP TABLE migrations");
 		
 		// Delete migration file
