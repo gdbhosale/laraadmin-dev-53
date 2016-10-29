@@ -60,6 +60,7 @@ class FieldNameTest extends TestCase
 			->check('required')
 			->press('Submit')
 			->see("StudentsController")
+			->see('view_col_name')
 			->click('view_col_name')
 			->dontSee('view_col_name')
 			->see('generate_migr_crud');
@@ -102,9 +103,27 @@ class FieldNameTest extends TestCase
 		$this->visit('/admin/modules/'.$this->probable_module_id)
 			->see("StudentsController")
 			->click('delete_name');
-		
-		$this->del_test_cruds();
 	}
+
+	/**
+     * Delete Current Test Data
+     *
+     * @return void
+     */
+	public function testDeleteData()
+    {
+		// Delete CRUD's Data
+		$this->del_test_cruds();
+
+		// Delete migration file
+		$mgr_file = LAHelper::get_migration_file("students_table");
+		if($mgr_file != "") {
+			unlink($mgr_file);
+		}
+		// Delete migration table
+		$this->artisan('db:reset');
+		DB::statement("DROP TABLE migrations");
+    }
 
 	private function del_test_cruds()
 	{
@@ -135,25 +154,5 @@ class FieldNameTest extends TestCase
         } else {
             exec('git checkout '.'app/Http/admin_routes.php');
         }
-
-		$this->artisan('migrate:refresh');
-		$this->artisan('db:seed');
 	}
-
-	/**
-     * A basic test example.
-     *
-     * @return void
-     */
-    public function testCreatedMigrationDeletion()
-    {
-		// Find existing test migration file and delete it
-        $mfiles = scandir(base_path('database/migrations/'));
-        foreach ($mfiles as $mfile) {
-            if(str_contains($mfile, "students")) {
-                $mgr_file = base_path('database/migrations/'.$mfile);
-                unlink($mgr_file);
-            }
-        }
-    }
 }

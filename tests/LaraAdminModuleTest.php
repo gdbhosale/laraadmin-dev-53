@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use DB;
 
 class LaraAdminModuleTest extends TestCase
 {
@@ -345,13 +346,31 @@ class LaraAdminModuleTest extends TestCase
 	 */
 	public function testModuleUsageFull()
 	{
-		$this->visit('/admin/students')
-			->see('Students listing')
-			->see('Add Student');
-		
-		$this->del_test_cruds();
+		// $this->visit('/admin/students')
+		// 	->see('Students listing')
+		// 	->see('Add Student');
 	}
 	
+	/**
+     * Delete Current Test Data
+     *
+     * @return void
+     */
+	public function testDeleteData()
+    {
+		// Delete CRUD's Data
+		$this->del_test_cruds();
+
+		// Delete migration file
+		$mgr_file = LAHelper::get_migration_file("students_table");
+		if($mgr_file != "") {
+			unlink($mgr_file);
+		}
+		// Delete migration table
+		$this->artisan('db:reset');
+		DB::statement("DROP TABLE migrations");
+    }
+
 	private function del_test_cruds()
 	{
 		unlink(base_path('/app/Http/Controllers/LA/StudentsController.php'));
@@ -381,29 +400,5 @@ class LaraAdminModuleTest extends TestCase
         } else {
             exec('git checkout '.'app/Http/admin_routes.php');
         }
-
-		$this->artisan('migrate:refresh');
-		$this->artisan('db:seed');
 	}
-
-	/**
-     * A basic test example.
-     *
-     * @return void
-     */
-	/*
-    public function testCreatedMigrationDeletion()
-    {
-		// Find existing test migration file and delete it
-        $mfiles = scandir(base_path('database/migrations/'));
-        foreach ($mfiles as $mfile) {
-            if(str_contains($mfile, "students")) {
-                $mgr_file = base_path('database/migrations/'.$mfile);
-				echo $mgr_file;
-				if(file_exists($mgr_file))
-                	unlink($mgr_file);
-            }
-        }
-    }
-	*/
 }
