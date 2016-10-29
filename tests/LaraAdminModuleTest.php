@@ -381,6 +381,17 @@ class LaraAdminModuleTest extends TestCase
 			unlink($mgr_file);
 		}
 
+		// dump autoload
+		$composer_path = "composer";
+		if(PHP_OS == "Darwin") {
+			$composer_path = "/usr/bin/composer.phar";
+		} else if(PHP_OS == "Linux") {
+			$composer_path = "/usr/bin/composer";
+		} else if(PHP_OS == "Windows") {
+			$composer_path = "composer";
+		}
+		Log::info(exec($composer_path.' dump-autoload'));
+
 		$this->artisan('migrate');
     }
 }

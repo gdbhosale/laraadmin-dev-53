@@ -8,6 +8,7 @@ use Log;
 class FieldNameTest extends TestCase
 {
 	use DatabaseMigrations;
+	// use DatabaseTransactions;
 
 	var $probable_module_id = 9;
 
@@ -19,6 +20,9 @@ class FieldNameTest extends TestCase
 	public function setUp()
 	{
 		parent::setUp();
+
+		// $this->refreshApplication();
+
 		// Generate Seeds
 		$this->artisan('db:seed');
 
@@ -71,21 +75,19 @@ class FieldNameTest extends TestCase
 			->see('from Student module')
 			->press('Update')
 			->see("StudentsController");
-
+		
 		// Generate CRUD's
-
+		
 		Log::info("Generate CRUD's");
 
-		// $this->visit('/admin/module_generate_migr_crud/'.$this->probable_module_id)->see('xyz');
-		
 		$response = $this->call('GET', '/admin/module_generate_migr_crud/'.$this->probable_module_id);
 		Log::info($response->content()." - ".$response->status());
 		$this->assertEquals(200, $response->status());
 
-		// $this->visit('/admin/modules/'.$this->probable_module_id)
-		// 	->see('Module Generated')
-		// 	->see('Update Module')
-		// 	->see('StudentsController');
+		$this->visit('/admin/modules/'.$this->probable_module_id)
+			->see('Module Generated')
+			->see('Update Module')
+			->see('StudentsController');
 	}
 
 	/**
@@ -143,6 +145,17 @@ class FieldNameTest extends TestCase
 		if($mgr_file != "") {
 			unlink($mgr_file);
 		}
+
+		// dump autoload
+		$composer_path = "composer";
+		if(PHP_OS == "Darwin") {
+			$composer_path = "/usr/bin/composer.phar";
+		} else if(PHP_OS == "Linux") {
+			$composer_path = "/usr/bin/composer";
+		} else if(PHP_OS == "Windows") {
+			$composer_path = "composer";
+		}
+		Log::info(exec($composer_path.' dump-autoload'));
 
 		$this->artisan('migrate');
     }
