@@ -359,11 +359,11 @@ class LaraAdminModuleTest extends TestCase
 	public function testDeleteData()
     {
 		// Delete CRUD's Data
-		unlink(base_path('/app/Http/Controllers/LA/StudentsController.php'));
-		unlink(base_path('/app/Models/Student.php'));
-		unlink(base_path('/resources/views/la/students/edit.blade.php'));
-		unlink(base_path('/resources/views/la/students/index.blade.php'));
-		unlink(base_path('/resources/views/la/students/show.blade.php'));
+		LAHelper::deleteFile(base_path('/app/Http/Controllers/LA/StudentsController.php'));
+		LAHelper::deleteFile(base_path('/app/Models/Student.php'));
+		LAHelper::deleteFile(base_path('/resources/views/la/students/edit.blade.php'));
+		LAHelper::deleteFile(base_path('/resources/views/la/students/index.blade.php'));
+		LAHelper::deleteFile(base_path('/resources/views/la/students/show.blade.php'));
 
         if(LAHelper::laravel_ver() == 5.3) {
             exec('git checkout '.'routes/admin_routes.php');
@@ -373,7 +373,6 @@ class LaraAdminModuleTest extends TestCase
 
 		// Delete migration table
 		$this->artisan('migrate:reset');
-		$tables = LAHelper::getDBTables([-1]);
 		DB::statement("DROP TABLE migrations");
 		
 		// Delete migration file
