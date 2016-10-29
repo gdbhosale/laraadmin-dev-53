@@ -4,7 +4,7 @@ use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class FieldNameTest extends TestCase
+class NameTest extends TestCase
 {
 	use DatabaseMigrations;
 	// use DatabaseTransactions;
