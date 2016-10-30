@@ -391,6 +391,7 @@ class LaraAdminModuleTest extends TestCase
 		}
 		$this->artisan('clear-compiled');
 		$this->artisan('cache:clear');
+		$this->artisan('view:clear');
 		// Log::info(exec($composer_path.' dump-autoload'));
 
 		$this->refreshApplication();

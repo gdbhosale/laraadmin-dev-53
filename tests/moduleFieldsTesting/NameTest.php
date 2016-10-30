@@ -53,7 +53,7 @@ class NameTest extends TestCase
 			->select('16', 'field_type')
 			->check('unique')
 			->type('', 'defaultvalue')
-			->type('10', 'minlength')
+			->type('5', 'minlength')
 			->type('100', 'maxlength')
 			->check('required')
 			->press('Submit')
@@ -70,6 +70,10 @@ class NameTest extends TestCase
 			->press('Update')
 			->see("StudentsController");
 		
+		$rowCount = DB::table("module_fields")->where("module", $this->probable_module_id)->count();
+
+		echo "\n\nmodule fields count: ".$rowCount."\n\n";
+
 		// Generate CRUD's
 		
 		Log::info("Generate CRUD's");
@@ -77,7 +81,7 @@ class NameTest extends TestCase
 		$response = $this->call('GET', '/admin/module_generate_migr_crud/'.$this->probable_module_id);
 		Log::info($response->content()." - ".$response->status());
 		$this->assertEquals(200, $response->status());
-
+		
 		$this->visit('/admin/modules/'.$this->probable_module_id)
 			->see('Module Generated')
 			->see('Update Module')
@@ -90,8 +94,16 @@ class NameTest extends TestCase
 		$this->visit('/admin/students')
 			->see('Students listing')
 			->type('John Doe', 'name')
-			->press('Submit')
-			->see("John Doe");
+			->see('add_record7')
+			->press('Add')
+			->seePageIs('/admin/students')
+			->see("Students listing");
+		
+		$rowCount = DB::table("students")->count();
+
+		echo "\n\nstudents: ".$rowCount."\n\n";
+
+		$this->seeInDatabase('students', [ 'name' => 'John Doe' ]);
 		
 		// View a Row
 		$this->visit('/admin/students/1')
@@ -180,6 +192,7 @@ class NameTest extends TestCase
 		}
 		$this->artisan('clear-compiled');
 		$this->artisan('cache:clear');
+		$this->artisan('view:clear');
 		// Log::info(exec($composer_path.' dump-autoload'));
 
 		$this->refreshApplication();
