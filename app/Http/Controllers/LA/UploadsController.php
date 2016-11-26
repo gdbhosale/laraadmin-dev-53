@@ -1,7 +1,10 @@
 <?php
 /**
- * Controller genrated using LaraAdmin
+ * Controller generated using LaraAdmin
  * Help: http://laraadmin.com
+ * LaraAdmin is open-sourced software licensed under the MIT license.
+ * Developed by: Dwij IT Solutions
+ * Developer Website: http://dwijitsolutions.com
  */
 
 namespace App\Http\Controllers\LA;
@@ -29,23 +32,10 @@ use App\Models\Upload;
 class UploadsController extends Controller
 {
 	public $show_action = true;
-	public $view_col = 'name';
-	public $listing_cols = ['id', 'name', 'path', 'extension', 'caption', 'user_id'];
 	
 	public function __construct() {
 		// for authentication (optional)
 		$this->middleware('auth', ['except' => 'get_file']);
-		
-		$module = Module::get('Uploads');
-		$listing_cols_temp = array();
-		foreach ($this->listing_cols as $col) {
-			if($col == 'id') {
-				$listing_cols_temp[] = $col;
-			} else if(Module::hasFieldAccess($module->id, $module->fields[$col]['id'])) {
-				$listing_cols_temp[] = $col;
-			}
-		}
-		$this->listing_cols = $listing_cols_temp;
 	}
 	
 	/**
@@ -60,7 +50,6 @@ class UploadsController extends Controller
 		if(Module::hasAccess($module->id)) {
 			return View('la.uploads.index', [
 				'show_actions' => $this->show_action,
-				'listing_cols' => $this->listing_cols,
 				'module' => $module
 			]);
 		} else {

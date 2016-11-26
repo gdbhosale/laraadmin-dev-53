@@ -1,7 +1,10 @@
 <?php
 /**
- * Controller genrated using LaraAdmin
+ * Controller generated using LaraAdmin
  * Help: http://laraadmin.com
+ * LaraAdmin is open-sourced software licensed under the MIT license.
+ * Developed by: Dwij IT Solutions
+ * Developer Website: http://dwijitsolutions.com
  */
 
 namespace App\Http\Controllers\LA;
@@ -22,20 +25,6 @@ use App\Models\Organization;
 class OrganizationsController extends Controller
 {
 	public $show_action = true;
-	public $view_col = 'name';
-	public $listing_cols = ['id', 'profile_image', 'name', 'email', 'phone', 'website', 'assigned_to', 'city'];
-	
-	public function __construct() {
-		// Field Access of Listing Columns
-		if(\Dwij\Laraadmin\Helpers\LAHelper::laravel_ver() == 5.3) {
-			$this->middleware(function ($request, $next) {
-				$this->listing_cols = ModuleFields::listingColumnAccessScan('Organizations', $this->listing_cols);
-				return $next($request);
-			});
-		} else {
-			$this->listing_cols = ModuleFields::listingColumnAccessScan('Organizations', $this->listing_cols);
-		}
-	}
 	
 	/**
 	 * Display a listing of the Organizations.
@@ -49,7 +38,7 @@ class OrganizationsController extends Controller
 		if(Module::hasAccess($module->id)) {
 			return View('la.organizations.index', [
 				'show_actions' => $this->show_action,
-				'listing_cols' => $this->listing_cols,
+				'listing_cols' => Module::getListingColumns('Organizations'),
 				'module' => $module
 			]);
 		} else {
@@ -111,7 +100,7 @@ class OrganizationsController extends Controller
 				
 				return view('la.organizations.show', [
 					'module' => $module,
-					'view_col' => $this->view_col,
+					'view_col' => $module->view_col,
 					'no_header' => true,
 					'no_padding' => "no-padding"
 				])->with('organization', $organization);
@@ -134,18 +123,16 @@ class OrganizationsController extends Controller
 	 */
 	public function edit($id)
 	{
-		if(Module::hasAccess("Organizations", "edit")) {
+		if(Module::hasAccess("Organizations", "edit")) {			
 			$organization = Organization::find($id);
-			if(isset($organization->id)) {
-				$organization = Organization::find($id);
-				
+			if(isset($organization->id)) {	
 				$module = Module::get('Organizations');
 				
 				$module->row = $organization;
 				
 				return view('la.organizations.edit', [
 					'module' => $module,
-					'view_col' => $this->view_col,
+					'view_col' => $module->view_col,
 				])->with('organization', $organization);
 			} else {
 				return view('errors.404', [
@@ -209,17 +196,20 @@ class OrganizationsController extends Controller
 	 *
 	 * @return
 	 */
-	public function dtajax()
+	public function dtajax(Request $request)
 	{
-		$values = DB::table('organizations')->select($this->listing_cols)->whereNull('deleted_at');
+		$module = Module::get('Organizations');
+		$listing_cols = Module::getListingColumns('Organizations');
+
+		$values = DB::table('organizations')->select($listing_cols)->whereNull('deleted_at');
 		$out = Datatables::of($values)->make();
 		$data = $out->getData();
 
 		$fields_popup = ModuleFields::getModuleFields('Organizations');
 		
 		for($i=0; $i < count($data->data); $i++) {
-			for ($j=0; $j < count($this->listing_cols); $j++) {
-				$col = $this->listing_cols[$j];
+			for ($j=0; $j < count($listing_cols); $j++) { 
+				$col = $listing_cols[$j];
 				if($fields_popup[$col] != null && $fields_popup[$col]->field_type_str == "Image") {
 					if($data->data[$i][$j] != 0) {
 						$img = \App\Models\Upload::find($data->data[$i][$j]);
@@ -235,7 +225,7 @@ class OrganizationsController extends Controller
 				if($fields_popup[$col] != null && starts_with($fields_popup[$col]->popup_vals, "@")) {
 					$data->data[$i][$j] = ModuleFields::getFieldValue($fields_popup[$col], $data->data[$i][$j]);
 				}
-				if($col == $this->view_col) {
+				if($col == $module->view_col) {
 					$data->data[$i][$j] = '<a href="'.url(config('laraadmin.adminRoute') . '/organizations/'.$data->data[$i][0]).'">'.$data->data[$i][$j].'</a>';
 				}
 				// else if($col == "author") {

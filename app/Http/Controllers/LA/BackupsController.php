@@ -1,7 +1,10 @@
 <?php
 /**
- * Controller genrated using LaraAdmin
+ * Controller generated using LaraAdmin
  * Help: http://laraadmin.com
+ * LaraAdmin is open-sourced software licensed under the MIT license.
+ * Developed by: Dwij IT Solutions
+ * Developer Website: http://dwijitsolutions.com
  */
 
 namespace App\Http\Controllers\LA;
@@ -18,27 +21,14 @@ use Dwij\Laraadmin\Models\Module;
 use Dwij\Laraadmin\Models\ModuleFields;
 use Dwij\Laraadmin\Helpers\LAHelper;
 use Artisan;
+
 use App\Models\Backup;
 
 class BackupsController extends Controller
 {
 	public $show_action = true;
-	public $view_col = 'name';
-	public $listing_cols = ['id', 'name', 'file_name'];
 	public $backup_filepath = "/storage/app/http---localhost/";
-	
-	public function __construct() {
-		// Field Access of Listing Columns
-		if(LAHelper::laravel_ver() == 5.3) {
-			$this->middleware(function ($request, $next) {
-				$this->listing_cols = ModuleFields::listingColumnAccessScan('Backups', $this->listing_cols);
-				return $next($request);
-			});
-		} else {
-			$this->listing_cols = ModuleFields::listingColumnAccessScan('Backups', $this->listing_cols);
-		}
-	}
-	
+
 	/**
 	 * Display a listing of the Backups.
 	 *
@@ -51,7 +41,7 @@ class BackupsController extends Controller
 		if(Module::hasAccess($module->id)) {
 			return View('la.backups.index', [
 				'show_actions' => $this->show_action,
-				'listing_cols' => $this->listing_cols,
+				'listing_cols' => Module::getListingColumns('Backups'),
 				'module' => $module
 			]);
 		} else {
@@ -144,22 +134,25 @@ class BackupsController extends Controller
 	 *
 	 * @return
 	 */
-	public function dtajax()
+	public function dtajax(Request $request)
 	{
-		$values = DB::table('backups')->select($this->listing_cols)->orderBy('created_at', 'desc')->whereNull('deleted_at');
+		$module = Module::get('Backups');
+		$listing_cols = Module::getListingColumns('Backups');
+
+		$values = DB::table('backups')->select($listing_cols)->whereNull('deleted_at');
 		$out = Datatables::of($values)->make();
 		$data = $out->getData();
 
 		$fields_popup = ModuleFields::getModuleFields('Backups');
 		
 		for($i=0; $i < count($data->data); $i++) {
-			for ($j=0; $j < count($this->listing_cols); $j++) { 
-				$col = $this->listing_cols[$j];
+			for ($j=0; $j < count($listing_cols); $j++) { 
+				$col = $listing_cols[$j];
 				if($fields_popup[$col] != null && starts_with($fields_popup[$col]->popup_vals, "@")) {
 					$data->data[$i][$j] = ModuleFields::getFieldValue($fields_popup[$col], $data->data[$i][$j]);
 				}
-				if($col == $this->view_col) {
-					$data->data[$i][$j] = '<a href="'.url(config('laraadmin.adminRoute') . '/backups/'.$data->data[$i][0]).'">'.$data->data[$i][$j].'</a>';
+				if($col == $module->view_col) {
+					$data->data[$i][$j] = '<a href="'.url(config('laraadmin.adminRoute') . '/downloadBackup/'.$data->data[$i][0]).'">'.$data->data[$i][$j].'</a>';
 				} else if($col == "file_name") {
 				   $data->data[$i][$j] = $this->backup_filepath.$data->data[$i][$j];
 				}
