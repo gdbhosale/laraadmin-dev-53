@@ -1,4 +1,11 @@
 <?php
+/**
+ * Code generated using LaraAdmin
+ * Help: http://laraadmin.com
+ * LaraAdmin is open-sourced software licensed under the MIT license.
+ * Developed by: Dwij IT Solutions
+ * Developer Website: http://dwijitsolutions.com
+ */
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -127,7 +134,7 @@ class LaraAdminModuleTest extends TestCase
 			->select('5', 'field_type')
 			->uncheck('unique')
 			->type('', 'defaultvalue')
-			->check('required')
+			->uncheck('required')
 			->press('Submit');
 		$this->see("StudentsController")
 			->type('Weight', 'label')
@@ -336,6 +343,7 @@ class LaraAdminModuleTest extends TestCase
 			->see('Module Generated')
 			->see('Update Module')
 			->see('StudentsController');
+		
 	}
 
 	/**
@@ -345,9 +353,9 @@ class LaraAdminModuleTest extends TestCase
 	 */
 	public function testModuleUsageFull()
 	{
-		// $this->visit('/admin/students')
-		// 	->see('Students listing')
-		// 	->see('Add Student');
+		$this->visit('/admin/students')
+			->see('Students listing')
+			->see('Add Student');
 	}
 	
 	/**
